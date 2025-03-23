@@ -1,0 +1,22 @@
+{
+  "duration": "2025-03-23T13:17:23.273491",
+  "operations": {
+    "total": 442,
+    "successful": 442,
+    "failed": 0,
+    "success_rate": "100.00%"
+  },
+  "performance": {
+    "avg_latency": "91.38ms",
+    "shard_distribution": {
+      "node_0": 7,
+      "node_1": 7,
+      "node_2": 7
+    }
+  },
+  "shard_manager": {
+    "total_shards": 1507,
+    "total_storage": 117112164,
+    "rebalance_operations": 0
+  }
+}
