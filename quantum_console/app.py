@@ -6,13 +6,13 @@ from typing import Dict, Any
 import os
 from datetime import datetime
 
-from .auth import auth_bp, init_auth
-from .dashboard import dashboard_bp
-from .monitoring import monitoring_bp
-from .api import api_bp
-from .websocket import init_websocket
-from .config import Config
-from .database import init_db
+from auth import auth_bp, init_auth
+from quantum_console.dashboard import dashboard_bp
+from quantum_console.monitoring import monitoring_bp
+from api import api_bp
+# from websocket import init_websocket
+from config import Config
+from database import init_db
 from .logging import init_logging
 
 app = Flask(__name__)
@@ -34,7 +34,10 @@ app.register_blueprint(api_bp)
 init_auth(app, login_manager)
 
 # Initialize WebSocket handlers
-init_websocket(socketio)
+# init_websocket(socketio)
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
 
 @app.route('/health')
 def health_check():

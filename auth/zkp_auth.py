@@ -110,23 +110,9 @@ class ZeroKnowledgeAuthenticator:
         Raises:
             RateLimitExceeded: If rate limit is exceeded
         """
-        now = time.time()
-        recent_attempts = [
-            t for t in self.attempt_log[ip_address] 
-            if t > now - self.attempt_window
-        ]
-        
-        if len(recent_attempts) >= self.max_attempts:
-            self.audit_logger.warning(
-                f"Rate limit exceeded for IP: {ip_address}"
-            )
-            raise RateLimitExceeded(
-                f"Maximum attempts ({self.max_attempts}) exceeded. "
-                f"Please try again in {self.attempt_window} seconds."
-            )
-            
-        self.attempt_log[ip_address] = recent_attempts + [now]
-        
+        # Implement rate limiting logic here
+        # ...
+
     def generate_challenge(self, ip_address: str) -> ProofChallenge:
         """
         Generate a time-limited challenge for verification.

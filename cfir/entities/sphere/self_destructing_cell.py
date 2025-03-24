@@ -1,17 +1,15 @@
 import threading
 import time
 import math
-from typing import Dict, Any, Optional, Tuple
+from typing import Dict, Any, Optional, Tuple, List
 from dataclasses import dataclass
 import logging
+from cfir.entities.sphere.sphere_entity import SphericalCoordinates
 
-@dataclass
-class SphericalCoordinates:
-    r: float      # radius
-    theta: float  # polar angle (0 to π)
-    phi: float    # azimuthal angle (0 to 2π)
     
 class SelfDestructingDataCell:
+    """Self-destructing data cell with observer pattern."""
+    
     def __init__(
         self, 
         data: Any,
@@ -36,6 +34,7 @@ class SelfDestructingDataCell:
         self._destruction_timer: Optional[threading.Timer] = None
         self._is_destroyed = False
         self._lock = threading.Lock()
+        self._observers: List[callable] = []
         
         # Configure logging
         self.logger = logging.getLogger(__name__)
@@ -49,8 +48,7 @@ class SelfDestructingDataCell:
         if self.lifespan_seconds is not None:
             self._destruction_timer = threading.Timer(
                 self.lifespan_seconds, 
-                self.destroy,
-                args=["Timer expiration"]
+                self.destroy
             )
             self._destruction_timer.start()
             self.logger.info(
@@ -75,7 +73,7 @@ class SelfDestructingDataCell:
             
             # Check if new position is within allowed Horizon
             if not self.check_spatial_boundaries():
-                self.destroy("Spatial boundary violation")
+                self.destroy()
                 return False
                 
             return True
@@ -89,12 +87,9 @@ class SelfDestructingDataCell:
         """
         return self.coordinates.r <= self.horizon_radius
         
-    def destroy(self, reason: str = "Unspecified") -> None:
+    def destroy(self) -> None:
         """
         Destroy the data cell and clean up resources.
-        
-        Args:
-            reason: The reason for destruction
         """
         with self._lock:
             if self._is_destroyed:
@@ -108,7 +103,9 @@ class SelfDestructingDataCell:
             self.data = None
             self._is_destroyed = True
             
-            self.logger.info(f"Data cell destroyed. Reason: {reason}")
+            self.logger.info("Data cell destroyed")
+            
+            self.notify_observers("Data cell destroyed")
             
     def is_alive(self) -> bool:
         """Check if the data cell still exists."""
@@ -132,3 +129,10 @@ class SelfDestructingDataCell:
             float: Age in seconds
         """
         return time.time() - self.creation_time 
+
+    def add_observer(self, observer: callable) -> None:
+        self._observers.append(observer)
+
+    def notify_observers(self, message: str) -> None:
+        for observer in self._observers:
+            observer(message) 

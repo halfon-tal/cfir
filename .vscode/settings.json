@@ -1,0 +1,15 @@
+{
+    "python.analysis.extraPaths": [
+        "./quantum_console/core",
+        "./cfir/entities",
+        "./cfir/horizons",
+        "./cfir/meshes",
+        "./cfir/universes",
+        "./sphere",
+        "./spatial",
+        "./quantum",
+        "./zkp",
+        "./demo_examples",
+        "./auth"
+    ]
+}

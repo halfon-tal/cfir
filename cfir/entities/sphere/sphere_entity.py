@@ -14,8 +14,8 @@ from collections import defaultdict
 
 from spatial_auth import SphericalCoordinates, SpatialAuthError
 from quantum_encryption import QuantumEncryption
-from hybrid_executor import HybridExecutionManager, Task, TaskPriority
-from anomaly_detection import IntrusionDetector, AnomalyType, AlertSeverity
+from quantum_console.core.hybrid_executer import HybridExecutionManager, Task, TaskPriority
+from quantum_console.spatial_auth.anomaly_detection import IntrusionDetector, AnomalyType, AlertSeverity
 
 class SyncStatus(Enum):
     """Synchronization status of data."""
@@ -111,15 +111,15 @@ class SphereEntity:
         self.coordinates = coordinates
         self.name = name
         self.universe = universe
+        self.encryption_key = encryption_key
         self.max_local_storage = max_local_storage
+        self._local_storage: Dict[str, DataRecord] = {}
+        self._pending_syncs: Set[str] = set()
+        self._storage_lock = Lock()
+        self.logger = logging.getLogger(f"SphereEntity.{self.entity_id}")
         
         # Initialize storage and sync queue
-        self._local_storage: Dict[str, DataRecord] = {}
         self._sync_queue: asyncio.Queue = asyncio.Queue()
-        self._pending_syncs: Set[str] = set()
-        
-        # Thread safety
-        self._storage_lock = Lock()
         self._sync_lock = Lock()
         
         # Initialize encryption
@@ -136,9 +136,6 @@ class SphereEntity:
             cpu_count=2,
             qpu_count=1
         )
-        
-        # Configure logging
-        self.logger = logging.getLogger(f"entity_{self.entity_id}")
         
         # Start sync worker
         self._start_sync_worker()

@@ -6,9 +6,9 @@ from datetime import datetime
 from threading import Lock
 import json
 
-from ..models import Entity, Zone
+from cfir.entities import Entity, Zone
 from ..spatial_auth import SphericalCoordinates
-from ..quantum_encryption import QuantumEncryption
+from quantum_encryption import QuantumEncryption
 
 @dataclass
 class SensorReading:

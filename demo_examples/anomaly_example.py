@@ -3,7 +3,7 @@ import time
 from sphere_entity import SphereEntity
 from sphere_universe import Universe
 from spatial_auth import SphericalCoordinates
-from anomaly_detection import AlertSeverity
+from quantum_console.spatial_auth.anomaly_detection import AlertSeverity
 
 # Configure logging
 logging.basicConfig(

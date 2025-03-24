@@ -9,6 +9,8 @@ from threading import Lock
 import json
 from datetime import datetime, timedelta
 
+from spatial_auth import SphericalCoordinates
+
 class AnomalyType(Enum):
     """Types of anomalies that can be detected."""
     ACCESS_FREQUENCY = "access_frequency"
@@ -36,6 +38,42 @@ class AnomalyAlert:
     resolved: bool = False
     resolution_time: Optional[float] = None
     resolution_notes: Optional[str] = None
+
+class AnomalyDetectionStrategy:
+    """Base class for anomaly detection strategies."""
+    def detect(self, *args, **kwargs) -> Optional[AnomalyAlert]:
+        raise NotImplementedError("Must implement detect method")
+
+class AccessFrequencyDetection(AnomalyDetectionStrategy):
+    """Detects anomalies based on access frequency."""
+    
+    def __init__(self, max_frequency: int):
+        self.max_frequency = max_frequency
+        self.access_times = []
+        self._lock = Lock()
+
+    def record_access(self, timestamp: float) -> None:
+        with self._lock:
+            self.access_times.append(timestamp)
+            self.cleanup_old_records()
+
+    def cleanup_old_records(self) -> None:
+        cutoff = time.time() - 3600  # 1 hour window
+        self.access_times = [t for t in self.access_times if t > cutoff]
+
+    def detect(self) -> Optional[AnomalyAlert]:
+        with self._lock:
+            frequency = len(self.access_times) / 3600  # Calculate frequency per hour
+            if frequency > self.max_frequency:
+                return AnomalyAlert(
+                    alert_id="access_frequency_alert",
+                    anomaly_type=AnomalyType.ACCESS_FREQUENCY,
+                    severity=AlertSeverity.HIGH,
+                    timestamp=time.time(),
+                    details={"frequency": frequency, "threshold": self.max_frequency},
+                    entity_id="system"
+                )
+        return None
 
 class AccessPattern:
     """Tracks and analyzes access patterns."""
@@ -88,7 +126,8 @@ class IntrusionDetector:
     def __init__(
         self,
         entity_id: str,
-        config: Optional[Dict] = None
+        config: Optional[Dict] = None,
+        strategies: List[AnomalyDetectionStrategy] = []
     ):
         """
         Initialize intrusion detector.
@@ -96,6 +135,7 @@ class IntrusionDetector:
         Args:
             entity_id: ID of entity to monitor
             config: Optional configuration overrides
+            strategies: List of anomaly detection strategies
         """
         self.entity_id = entity_id
         self.config = self._get_default_config()
@@ -118,6 +158,8 @@ class IntrusionDetector:
         
         # Statistical tracking
         self.stats = defaultdict(int)
+        
+        self.strategies = strategies
         
     @staticmethod
     def _get_default_config() -> Dict:
@@ -181,6 +223,11 @@ class IntrusionDetector:
                             {'failure_count': self.stats['failures']}
                         )
                     )
+            
+            for strategy in self.strategies:
+                alert = strategy.detect()
+                if alert:
+                    alerts.append(alert)
             
             return alerts[0] if alerts else None
             

@@ -8,7 +8,7 @@ import numpy as np
 from typing import List, Tuple
 import random
 from .physics_engine import PhysicsEngine, PhysicalProperties, EnvironmentalConditions
-from ..models import Entity, Zone
+from cfir.entities import Entity, Zone
 from ..spatial_auth import SphericalCoordinates
 
 logging.basicConfig(level=logging.INFO)

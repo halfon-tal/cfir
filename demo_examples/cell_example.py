@@ -1,6 +1,6 @@
 import logging
 import time
-from self_destructing_cell import SelfDestructingDataCell, SphericalCoordinates
+from sphere.self_destructing_cell import SelfDestructingDataCell, SphericalCoordinates
 
 # Configure logging
 logging.basicConfig(

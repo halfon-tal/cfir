@@ -1,6 +1,6 @@
 import logging
 import random
-from hybrid_executor import (
+from quantum_console.core.hybrid_executer import (
     HybridExecutionManager,
     Task,
     TaskPriority,

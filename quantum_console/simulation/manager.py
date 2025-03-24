@@ -8,7 +8,7 @@ from dataclasses import dataclass
 
 from .autonomous_nav import AutonomousVehicle
 from .smart_city import TrafficLight, SmartUtility
-from ..models import Entity, Zone
+from cfir.entities import Entity, Zone
 from ..spatial_auth import SphericalCoordinates
 
 @dataclass

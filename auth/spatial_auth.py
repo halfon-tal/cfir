@@ -1,4 +1,5 @@
 import math
+from zkp_auth import ProofChallenge, ProofResponse, ZeroKnowledgeAuthenticator
 from dataclasses import dataclass
 from typing import Tuple, Optional, List, Dict, Set
 import numpy as np
@@ -111,13 +112,8 @@ class SpatialIndex:
             cart_center[1] + radius,
             cart_center[2] + radius
         )
-        
-        results = set()
-        for obj_id in self.index.intersection(bbox):
-            obj = self.id_to_object[obj_id]
-            results.add(obj)
-            
-        return results
+        # Perform query and return results
+        return {self.id_to_object[id] for id in self.index.intersection(bbox)}
 
 class SpatialHorizon:
     """Defines the spatial boundary for data access."""
@@ -211,7 +207,6 @@ class SpatialEntity:
         self.name = name
         
         # Initialize ZKP authenticator
-        from zkp_auth import ZeroKnowledgeAuthenticator
         self.authenticator = ZeroKnowledgeAuthenticator(secret_credential)
         
         # Configure logging

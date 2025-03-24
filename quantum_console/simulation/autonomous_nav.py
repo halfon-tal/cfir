@@ -7,7 +7,7 @@ from threading import Lock
 
 from ..models import Entity, Zone
 from ..spatial_auth import SphericalCoordinates
-from ..anomaly_detection import IntrusionDetector
+from quantum_console.spatial_auth.anomaly_detection import IntrusionDetector
 
 @dataclass
 class NavigationState:
